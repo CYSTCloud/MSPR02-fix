@@ -1,0 +1,11 @@
+{
+    "created_at": "2025-05-30T23:08:19.213318",
+    "model_type": "predictions",
+    "country": "US",
+    "metrics": {
+        "rmse": 0.2087,
+        "mae": 0.1577,
+        "r2": 0.8368
+    },
+    "description": "Mod\u00e8le predictions pour les pr\u00e9dictions COVID-19 en US"
+}

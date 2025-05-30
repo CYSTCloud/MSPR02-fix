@@ -1,0 +1,9 @@
+Améliorations appliquées le 2025-05-30 20:28:42
+Nombre de pays traités: 23
+Pays traités: US, Brazil, India, Russia, South Africa, Mexico, Peru, Chile, United Kingdom, Iran, Pakistan, Spain, Saudi Arabia, Colombia, Italy, Turkey, Bangladesh, France, Germany, Argentina, South Korea, Japan, China
+
+Statistiques globales:
+- Nombre d'entrées avec 0 nouveaux cas (original): 7452 (27.5%)
+- Nombre d'entrées avec 0 nouveaux cas (amélioré): 16 (0.4%)
+- Moyenne des nouveaux cas (original): 608.04
+- Moyenne des nouveaux cas (amélioré): 4648.08

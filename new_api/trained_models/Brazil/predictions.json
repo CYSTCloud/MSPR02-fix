@@ -1,0 +1,11 @@
+{
+    "created_at": "2025-05-30T23:08:17.800922",
+    "model_type": "predictions",
+    "country": "Brazil",
+    "metrics": {
+        "rmse": 0.1676,
+        "mae": 0.0672,
+        "r2": 0.9026
+    },
+    "description": "Mod\u00e8le predictions pour les pr\u00e9dictions COVID-19 en Brazil"
+}
