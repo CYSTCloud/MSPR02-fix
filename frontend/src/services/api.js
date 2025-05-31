@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Instance axios avec configuration de base
 const api = axios.create({
-  baseURL: 'http://127.0.0.1:8000',
+  baseURL: process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000',
   headers: {
     'Content-Type': 'application/json'
   }
@@ -132,18 +132,27 @@ export const fetchCountries = async () => {
     
     return response.data;
   } catch (error) {
-    console.warn('Impossible de récupérer les pays depuis l\'API, utilisation de données simulées');
-    
-    // Données simulées pour permettre l'utilisation de l'application sans backend
-    const mockedData = {
-      countries: ['US', 'France', 'Germany', 'Italy', 'Spain', 'UK', 'Canada', 'Japan', 'China', 'India', 'Brazil', 'Russia', 'South Africa', 'Mexico', 'Australia'],
-      countries_with_models: ['US', 'France', 'Germany', 'Italy', 'Spain', 'UK', 'Canada', 'Japan', 'China', 'India'],
-      count: 15,
-      count_with_models: 10,
-      is_simulated: true
-    };
-    
-    return mockedData;
+    console.error('Erreur de connexion à l\'API (fetchCountries):', error.message);
+    if (error.code === 'ECONNREFUSED') {
+      console.error('Le serveur API n\'est pas accessible. Vérifiez qu\'il est démarré.');
+    }
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.info('Impossible de récupérer les pays depuis l\'API, utilisation de données simulées');
+
+      // Données simulées pour permettre l'utilisation de l'application sans backend
+      const mockedData = {
+        countries: ['US', 'France', 'Germany', 'Italy', 'Spain', 'UK', 'Canada', 'Japan', 'China', 'India', 'Brazil', 'Russia', 'South Africa', 'Mexico', 'Australia'],
+        countries_with_models: ['US', 'France', 'Germany', 'Italy', 'Spain', 'UK', 'Canada', 'Japan', 'China', 'India'],
+        count: 15,
+        count_with_models: 10,
+        is_simulated: true
+      };
+
+      return mockedData;
+    } else {
+      throw error;
+    }
   }
 };
 
@@ -177,15 +186,24 @@ export const fetchHistoricalData = async (country, startDate = '', endDate = '')
     
     return response.data;
   } catch (error) {
-    console.warn(`Génération de données simulées pour ${country} suite à une erreur:`, error);
-    
-    // Générer des données simulées en cas d'erreur
-    const simulatedData = generateRealisticData(country);
-    return {
-      country: country,
-      historical_data: simulatedData,
-      is_simulated: true
-    };
+    console.error(`Erreur de connexion à l\'API (fetchHistoricalData pour ${country}):`, error.message);
+    if (error.code === 'ECONNREFUSED') {
+      console.error('Le serveur API n\'est pas accessible. Vérifiez qu\'il est démarré.');
+    }
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.info(`Génération de données simulées pour ${country} suite à une erreur:`, error);
+
+      // Générer des données simulées en cas d'erreur
+      const simulatedData = generateRealisticData(country);
+      return {
+        country: country,
+        historical_data: simulatedData,
+        is_simulated: true
+      };
+    } else {
+      throw error;
+    }
   }
 };
 
@@ -226,25 +244,34 @@ export const fetchPredictions = async (country, days = 14, modelType = 'xgboost'
     
     return response.data;
   } catch (error) {
-    console.warn(`Génération de prédictions simulées pour ${country} suite à une erreur:`, error);
-    
-    try {
-      // Obtenir d'abord les données historiques pour baser les prédictions dessus
+    console.error(`Erreur de connexion à l\'API (fetchPredictions pour ${country}):`, error.message);
+    if (error.code === 'ECONNREFUSED') {
+      console.error('Le serveur API n\'est pas accessible. Vérifiez qu\'il est démarré.');
+    }
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.info(`Génération de prédictions simulées pour ${country} suite à une erreur:`, error);
+      
+      try {
+        // Obtenir d'abord les données historiques pour baser les prédictions dessus
       const historicalData = await fetchHistoricalData(country);
       
-      // Générer des prédictions réalistes basées sur les données historiques
-      const simulatedPredictionData = generateRealisticPredictions(historicalData.historical_data, days, modelType);
-      
-      return {
-        country: country,
-        model_type: modelType,
-        predictions: simulatedPredictionData.predictions,
-        metrics: simulatedPredictionData.metrics,
-        is_simulated: true
-      };
-    } catch (innerError) {
-      console.error(`Impossible de générer des prédictions simulées pour ${country}:`, innerError);
-      throw innerError;
+        // Générer des prédictions réalistes basées sur les données historiques
+        const simulatedPredictionData = generateRealisticPredictions(historicalData.historical_data, days, modelType);
+
+        return {
+          country: country,
+          model_type: modelType,
+          predictions: simulatedPredictionData.predictions,
+          metrics: simulatedPredictionData.metrics,
+          is_simulated: true
+        };
+      } catch (innerError) {
+        console.error(`Impossible de générer des prédictions simulées pour ${country}:`, innerError);
+        throw innerError;
+      }
+    } else {
+      throw error;
     }
   }
 };
@@ -336,31 +363,40 @@ export const fetchEnhancedPredictions = async (country, days = 30, modelType = '
       enhanced: true
     };
   } catch (error) {
-    console.warn(`Génération de prédictions améliorées simulées pour ${country} suite à une erreur:`, error);
-    
-    try {
-      // Obtenir d'abord les données historiques pour baser les prédictions dessus
+    console.error(`Erreur de connexion à l\'API (fetchEnhancedPredictions pour ${country}):`, error.message);
+    if (error.code === 'ECONNREFUSED') {
+      console.error('Le serveur API n\'est pas accessible. Vérifiez qu\'il est démarré.');
+    }
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.info(`Génération de prédictions améliorées simulées pour ${country} suite à une erreur:`, error);
+      
+      try {
+        // Obtenir d'abord les données historiques pour baser les prédictions dessus
       const historicalData = await fetchHistoricalData(country);
       
-      // Générer des prédictions réalistes basées sur les données historiques
-      const simulatedPredictionData = generateRealisticPredictions(
-        historicalData.historical_data, 
-        days, 
-        modelType,
-        true // Indique que ce sont des prédictions améliorées
-      );
-      
-      return {
-        country: country,
-        model_used: modelType,
-        predictions: simulatedPredictionData.predictions,
-        metrics: simulatedPredictionData.metrics,
-        is_simulated: true,
-        enhanced: true
-      };
-    } catch (innerError) {
-      console.error(`Impossible de générer des prédictions améliorées simulées pour ${country}:`, innerError);
-      throw innerError;
+        // Générer des prédictions réalistes basées sur les données historiques
+        const simulatedPredictionData = generateRealisticPredictions(
+          historicalData.historical_data,
+          days,
+          modelType,
+          true // Indique que ce sont des prédictions améliorées
+        );
+
+        return {
+          country: country,
+          model_used: modelType,
+          predictions: simulatedPredictionData.predictions,
+          metrics: simulatedPredictionData.metrics,
+          is_simulated: true,
+          enhanced: true
+        };
+      } catch (innerError) {
+        console.error(`Impossible de générer des prédictions améliorées simulées pour ${country}:`, innerError);
+        throw innerError;
+      }
+    } else {
+      throw error;
     }
   }
 };
@@ -376,10 +412,16 @@ export const fetchModelMetrics = async (country) => {
     const response = await api.get(`/api/models/${country}`);
     return response.data;
   } catch (error) {
-    console.warn(`Impossible de récupérer les métriques des modèles pour ${country}:`, error);
-    
-    // Métriques simulées en cas d'erreur
-    const mockedMetrics = {
+    console.error(`Erreur de connexion à l\'API (fetchModelMetrics pour ${country}):`, error.message);
+    if (error.code === 'ECONNREFUSED') {
+      console.error('Le serveur API n\'est pas accessible. Vérifiez qu\'il est démarré.');
+    }
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.info(`Impossible de récupérer les métriques des modèles pour ${country}:`, error);
+
+      // Métriques simulées en cas d'erreur
+      const mockedMetrics = {
       models: [
         { model_name: 'xgboost', metrics: { RMSE: 145.23, MAE: 110.45, 'R²': 0.87, 'Training Time': 2.5 } },
         { model_name: 'random_forest', metrics: { RMSE: 156.78, MAE: 121.34, 'R²': 0.83, 'Training Time': 3.1 } },
@@ -397,7 +439,10 @@ export const fetchModelMetrics = async (country) => {
       is_simulated: true
     };
     
-    return mockedMetrics;
+      return mockedMetrics;
+    } else {
+      throw error;
+    }
   }
 };
 
@@ -422,6 +467,10 @@ export const compareCountries = async (countries, metric = 'total_cases', startD
     const response = await api.post('/api/compare', payload);
     return response.data;
   } catch (error) {
+    console.error('Erreur de connexion à l\'API (compareCountries):', error.message);
+    if (error.code === 'ECONNREFUSED') {
+      console.error('Le serveur API n\'est pas accessible. Vérifiez qu\'il est démarré.');
+    }
     console.error('Erreur lors de la comparaison des pays:', error);
     throw error;
   }
